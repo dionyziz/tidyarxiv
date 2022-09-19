@@ -1,0 +1,21 @@
+{
+  "target": "main",
+  "files": [
+    "**/*.tex",
+    "**/*.sty",
+    "figures/**/*.tex",
+    "figures/*.pdf",
+    "**/*.bib"
+  ],
+  "files_exclude": [
+    "figures/bad-figure.pdf"
+  ],
+  "arxiv_files_include": [
+    "**/*.bbl"
+  ],
+  "arxiv_files_exclude": [
+    "**/*.bib"
+  ],
+  "remove_tex_comments": "\\.(tex|sty)$",
+  "build_command": "latexmk -pdf %FILE%"
+}
