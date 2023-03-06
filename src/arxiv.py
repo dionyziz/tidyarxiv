@@ -35,17 +35,17 @@ files_exclude = []
 if 'files_exclude' in config:
   files_exclude = config['files_exclude']
 
-import_files_exclude = files_exclude
+import_files_exclude = list(files_exclude)
 if 'import_files_exclude' in config:
   import_files_exclude += config['import_files_exclude']
 
-arxiv_files_include = files
+arxiv_files_include = list(files)
 if 'arxiv_files_include' in config:
   arxiv_files_include += config['arxiv_files_include']
 else:
   arxiv_files_include += ['**/*.bbl']
 
-arxiv_files_exclude = files_exclude
+arxiv_files_exclude = list(files_exclude)
 if 'arxiv_files_exclude' in config:
   arxiv_files_exclude += config['arxiv_files_exclude']
 else:
@@ -58,13 +58,18 @@ if 'build_command' in config:
 build_command = [part.replace('%FILE%', f'{target}.tex') for part in build_command.split(' ')]
 
 def build_file_list(include_globs, exclude_globs):
+  print('Exclude globs: ', exclude_globs)
+
   files = []
   for include_glob in include_globs:
     files += glob.glob(include_glob, recursive=True)
   files = list(set(files))
 
+  print('Files before exclusion: ', str(sorted(files)))
+
   for exclude_glob in exclude_globs:
     files = [f for f in files if not fnmatch.fnmatch(f, exclude_glob)]
+    print(f'Applying ${exclude_glob}: ', str(sorted(files)))
 
   return files
 
@@ -89,10 +94,11 @@ if 'filter_files_exclude' in config:
 with tempfile.TemporaryDirectory() as tmpdirname:
   print('Importing files')
 
-  files = build_file_list(files, files_exclude)
+  import_files = build_file_list(files, files_exclude)
+
   filtered_files = set(build_file_list(filter_files, filter_files_exclude))
 
-  for filename in sorted(files):
+  for filename in sorted(import_files):
     if os.path.isdir(filename):
       continue
 
@@ -129,8 +135,6 @@ with tempfile.TemporaryDirectory() as tmpdirname:
   build_time = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
 
   with tarfile.open(f'{target}_{build_time}.tar.gz', 'w:gz') as tar:
-    files = set()
-
     arxiv_files = build_file_list(arxiv_files_include, arxiv_files_exclude)
 
     for filename in sorted(arxiv_files):
