@@ -89,7 +89,7 @@ arxiv
 Dionysis Zindros and Joachim Neu, Stanford University
 
 # License
-MIT
+GPL v3
 
 # Alternatives
 See also the more complex [arxiv-latex-cleaner](https://github.com/google-research/arxiv-latex-cleaner).
