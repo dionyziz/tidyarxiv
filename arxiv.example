@@ -7,9 +7,7 @@
     "figures/*.pdf",
     "**/*.bib"
   ],
-  "files_exclude": [
-    "figures/bad-figure.pdf"
-  ],
+  "files_exclude": [],
   "arxiv_files_include": [
     "**/*.bbl"
   ],
