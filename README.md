@@ -35,6 +35,7 @@ Python 3.10+
 
 Create an .arxiv file in the root of your project. See
 [the example](https://github.com/dionyziz/arxiv/blob/main/arxiv.example).
+You can just copy over the example configuration, which has sane defaults.
 
 The file should be a JSON file, which is a dictionary with the following
 configuration keys:
@@ -79,7 +80,7 @@ arxiv
 # Features
 
 * Includes only the files you want, and excludes the files you don't want.
-* Removes LaTeX comments (only things that start with a "%", nothing more complex).
+* Removes LaTeX comments (anything after a "%", nothing more complex).
 * Gets rid of .bib files from the final tarball.
 * Configurable.
 * Sane configuration defaults.
