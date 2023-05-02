@@ -7,62 +7,15 @@ import tarfile
 import datetime
 import json
 
-try:
-  with open('.arxiv', encoding='utf-8') as f:
-    config = json.loads(f.read())
-except FileNotFoundError:
-  print('No .arxiv file found. Create an .arxiv file in the root of your project.')
-  sys.exit(1)
+CONFIG_NAME = '.arxiv'
 
-target = 'main'
-if 'target' in config:
-  target = config['target']
-  if not os.path.isfile(f'{target}.tex'):
-    print(f'No "{target}.tex" file was found. Check the "target" in your .arxiv file.')
-    sys.exit(1)
-else:
-  if not os.path.isfile('main.tex'):
-    print('No "main.tex" file found. Specify a "target" in your .arxiv file.')
-    sys.exit(1)
-  else:
-    print('No "target" specified in .arxiv file. Using "main".')
-
-files = ['**/*.tex', '**/*.sty', '**/*.bib']
-if 'files' in config:
-  files = config['files']
-
-files_exclude = []
-if 'files_exclude' in config:
-  files_exclude = config['files_exclude']
-
-import_files_exclude = list(files_exclude)
-if 'import_files_exclude' in config:
-  import_files_exclude += config['import_files_exclude']
-
-arxiv_files_include = list(files)
-if 'arxiv_files_include' in config:
-  arxiv_files_include += config['arxiv_files_include']
-else:
-  arxiv_files_include += ['**/*.bbl']
-
-arxiv_files_exclude = list(files_exclude)
-if 'arxiv_files_exclude' in config:
-  arxiv_files_exclude += config['arxiv_files_exclude']
-else:
-  arxiv_files_exclude += ['**/*.bib']
-
-build_command = 'latexmk -pdf %FILE%'
-if 'build_command' in config:
-  build_command = config['build_command']
-
-build_command = [part.replace('%FILE%', f'{target}.tex') for part in build_command.split(' ')]
-
-def build_file_list(include_globs, exclude_globs):
+def build_file_list(include_globs, exclude_globs, rootdir=None):
+  print('Include globs: ', include_globs)
   print('Exclude globs: ', exclude_globs)
 
   files = []
   for include_glob in include_globs:
-    files += glob.glob(include_glob, recursive=True)
+    files += glob.glob(include_glob, root_dir=rootdir, recursive=True)
   files = list(set(files))
 
   print('Files before exclusion: ', str(sorted(files)))
@@ -70,6 +23,8 @@ def build_file_list(include_globs, exclude_globs):
   for exclude_glob in exclude_globs:
     files = [f for f in files if not fnmatch.fnmatch(f, exclude_glob)]
     print(f'Applying ${exclude_glob}: ', str(sorted(files)))
+
+  print('Files after exclusion: ', str(sorted(files)))
 
   return files
 
@@ -83,68 +38,123 @@ def filter_tex(filepath):
   with open(filepath, 'w', encoding='utf-8') as f:
     f.write(''.join(contents))
 
-filter_files = ['**/*.tex', '**/*.sty']
-if 'filter_files' in config:
-  filter_files = config['filter_files']
-
-filter_files_exclude = []
-if 'filter_files_exclude' in config:
-  filter_files_exclude = config['filter_files_exclude']
-
-with tempfile.TemporaryDirectory() as tmpdirname:
-  print('Importing files')
-
-  import_files = build_file_list(files, files_exclude)
-
-  filtered_files = set(build_file_list(filter_files, filter_files_exclude))
-
-  for filename in sorted(import_files):
-    if os.path.isdir(filename):
-      continue
-
-    print('\tImporting', filename)
-
-    os.makedirs(os.path.join(tmpdirname, os.path.dirname(filename)), exist_ok=True)
-    target_file = os.path.join(tmpdirname, filename)
-    shutil.copy(filename, target_file)
-
-    if filename in filtered_files:
-      print('\t\tFiltering', filename)
-      filter_tex(target_file)
-
-  print('Building TeX')
-
-  made = subprocess.run(
-    build_command,
-    cwd=tmpdirname,
-    capture_output=True,
-    check=False
-  )
-
-  if made.returncode != 0:
-    with open('build.log', 'w', encoding='utf-8') as f:
-      f.write(made.stdout.decode('utf-8'))
-
-    print('Error building TeX. See build.log for details.')
+def arxiv():
+  try:
+    with open(CONFIG_NAME, encoding='utf-8') as f:
+      config = json.loads(f.read())
+  except FileNotFoundError:
+    print('No ${CONFIG_NAME} file found. Create a ${CONFIG_NAME} file in the root of your project.')
     sys.exit(1)
 
-  print('TeX built')
+  target = 'main'
+  if 'target' in config:
+    target = config['target']
+    if not os.path.isfile(f'{target}.tex'):
+      print(f'No "{target}.tex" file was found. Check the "target" in your ${CONFIG_NAME} file.')
+      sys.exit(1)
+  else:
+    if not os.path.isfile('main.tex'):
+      print('No "main.tex" file found. Specify a "target" in your ${CONFIG_NAME} file.')
+      sys.exit(1)
+    else:
+      print('No "target" specified in ${CONFIG_NAME} file. Using "main".')
 
-  print('Creating .tar file')
+  files = ['**/*.tex', '**/*.sty', '**/*.bib']
+  if 'files' in config:
+    files = config['files']
 
-  build_time = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+  files_exclude = []
+  if 'files_exclude' in config:
+    files_exclude = config['files_exclude']
 
-  with tarfile.open(f'{target}_{build_time}.tar.gz', 'w:gz') as tar:
-    arxiv_files = build_file_list(arxiv_files_include, arxiv_files_exclude)
+  import_files_exclude = list(files_exclude)
+  if 'import_files_exclude' in config:
+    import_files_exclude += config['import_files_exclude']
 
-    for filename in sorted(arxiv_files):
+  arxiv_files_include = list(files)
+  if 'arxiv_files_include' in config:
+    arxiv_files_include += config['arxiv_files_include']
+  else:
+    arxiv_files_include += ['**/*.bbl']
+
+  arxiv_files_exclude = list(files_exclude)
+  if 'arxiv_files_exclude' in config:
+    arxiv_files_exclude += config['arxiv_files_exclude']
+  else:
+    arxiv_files_exclude += ['**/*.bib']
+
+  build_command = 'latexmk -pdf %FILE%'
+  if 'build_command' in config:
+    build_command = config['build_command']
+
+  build_command = [part.replace(r'%FILE%', f'{target}.tex') for part in build_command.split(' ')]
+
+  filter_files = ['**/*.tex', '**/*.sty']
+  if 'filter_files' in config:
+    filter_files = config['filter_files']
+
+  filter_files_exclude = []
+  if 'filter_files_exclude' in config:
+    filter_files_exclude = config['filter_files_exclude']
+
+  with tempfile.TemporaryDirectory() as tmpdirname:
+    print('Importing files')
+
+    import_files = build_file_list(files, files_exclude)
+
+    filtered_files = set(build_file_list(filter_files, filter_files_exclude))
+
+    for filename in sorted(import_files):
       if os.path.isdir(filename):
         continue
 
-      print('\tAdding', filename)
-      tar.add(os.path.join(tmpdirname, filename), arcname=filename)
+      os.makedirs(os.path.join(tmpdirname, os.path.dirname(filename)), exist_ok=True)
+      target_file = os.path.join(tmpdirname, filename)
+      shutil.copy(filename, target_file)
 
-  shutil.copy(os.path.join(tmpdirname, f'{target}.pdf'), f'{target}_{build_time}.pdf')
+      print('\tImporting', filename)
+      print('\t\tto', target_file)
 
-  print('Tarball created: ', f'{target}_{build_time}.tar.gz')
-  print('PDF created: ', f'{target}_{build_time}.pdf')
+      if filename in filtered_files:
+        print('\t\tFiltering', filename)
+        filter_tex(target_file)
+
+    print('Building TeX')
+
+    made = subprocess.run(
+      build_command,
+      cwd=tmpdirname,
+      capture_output=True,
+      check=False
+    )
+
+    if made.returncode != 0:
+      with open('build.log', 'w', encoding='utf-8') as f:
+        f.write(made.stdout.decode('utf-8'))
+
+      print('Error building TeX. See build.log for details.')
+      sys.exit(1)
+
+    print('TeX built')
+
+    print('Creating .tar file')
+
+    build_time = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+
+    with tarfile.open(f'{target}_{build_time}.tar.gz', 'w:gz') as tar:
+      arxiv_files = build_file_list(arxiv_files_include, arxiv_files_exclude, rootdir=tmpdirname)
+
+      for filename in sorted(arxiv_files):
+        if os.path.isdir(filename):
+          continue
+
+        print('\tAdding', filename)
+        tar.add(os.path.join(tmpdirname, filename), arcname=filename)
+
+    shutil.copy(os.path.join(tmpdirname, f'{target}.pdf'), f'{target}_{build_time}.pdf')
+
+    print('Tarball created: ', f'{target}_{build_time}.tar.gz')
+    print('PDF created: ', f'{target}_{build_time}.pdf')
+
+if __name__ == '__main__':
+  arxiv()
