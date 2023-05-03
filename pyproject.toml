@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "arxiv"
-version = "0.1.0"
+name = "tidyarxiv"
+version = "0.1.3"
 description = "A simple script to prepare your LaTeX paper for arXiv submission"
 authors = [
   "Dionysis Zindros <dionyziz@stanford.edu>",
@@ -8,6 +8,11 @@ authors = [
 ]
 license = "GPL-3.0-only"
 readme = "README.md"
+
+
+[tool.poetry.scripts]
+tidyarxiv = "tidyarxiv.tidyarxiv:main"
+
 
 [tool.poetry.dependencies]
 python = "^3.10"

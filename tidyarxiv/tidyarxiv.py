@@ -38,7 +38,7 @@ def filter_tex(filepath):
   with open(filepath, 'w', encoding='utf-8') as f:
     f.write(''.join(contents))
 
-def arxiv():
+def main():
   try:
     with open(CONFIG_NAME, encoding='utf-8') as f:
       config = json.loads(f.read())
@@ -157,4 +157,4 @@ def arxiv():
     print('PDF created: ', f'{target}_{build_time}.pdf')
 
 if __name__ == '__main__':
-  arxiv()
+  main()
