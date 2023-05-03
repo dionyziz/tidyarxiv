@@ -2,12 +2,12 @@ A simple script to prepare your LaTeX paper for arXiv submission.
 
 # Description
 
-`arxiv` is a tiny script to run before publishing your paper on arXiv.
+`tidyarxiv` is a tiny script to run before publishing your paper on arXiv.
 
 First, you create an `.arxiv` configuration file within your project directory.
-Then you run `arxiv` on the root of your project directory.
+Then you run `tidyarxiv` on the root of your project directory.
 
-`arxiv` first copies over *only* the files you specify into a separate
+`tidyarxiv` first copies over *only* the files you specify into a separate
 temporary *staging* directory (first creating a list of all the files
 you choose to *include*, and then excluding all the files you choose
 to *exclude*, if any). It *filters* those files by removing unwanted
@@ -24,7 +24,7 @@ to [arXiv](https://arxiv.org/).
 Install using pip:
 
 ```
-pip install arxiv
+pip install tidyarxiv
 ```
 
 # Requirements
@@ -74,7 +74,7 @@ configuration keys:
 After installing and configuring, run in the root of your project directory:
 
 ```
-arxiv
+tidyarxiv
 ```
 
 # Features
