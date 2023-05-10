@@ -136,7 +136,14 @@ def main():
 
     if made.returncode != 0:
       with open(os.path.join(outdir, 'build.log'), 'w', encoding='utf-8') as f:
+        f.write('STDERR:\n')
+        f.write('=======\n')
+        f.write(made.stderr.decode('utf-8'))
+        f.write('\n')
+        f.write('STDOUT:\n')
+        f.write('=======\n')
         f.write(made.stdout.decode('utf-8'))
+        f.write('\n')
 
       print('Error building TeX. See build.log for details.')
       sys.exit(1)
