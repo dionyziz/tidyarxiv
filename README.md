@@ -42,6 +42,8 @@ configuration keys:
 
 * **target**: Optional. Specifies the root .tex file of your project
   (not including the .tex extension). If skipped, "main" is used.
+* **outdir**: Optional. Output directory in which to store the generated
+  .pdf and .tar.gz file. If skipped, "." is used.
 * **files**: Optional. Array of [glob file patterns](https://docs.python.org/3/library/glob.html#module-glob)
   necessary to build your project. By default, all .tex, .sty., and .bib
   files are included.

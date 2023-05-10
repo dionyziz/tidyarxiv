@@ -44,21 +44,26 @@ def main():
     with open(CONFIG_NAME, encoding='utf-8') as f:
       config = json.loads(f.read())
   except FileNotFoundError:
-    print('No ${CONFIG_NAME} file found. Create a ${CONFIG_NAME} file in the root of your project.')
+    print(f'No "{CONFIG_NAME}" file found. Create a "{CONFIG_NAME}" file in the root of your project.')
     sys.exit(1)
 
   target = 'main'
   if 'target' in config:
     target = config['target']
     if not os.path.isfile(f'{target}.tex'):
-      print(f'No "{target}.tex" file was found. Check the "target" in your ${CONFIG_NAME} file.')
+      print(f'No "{target}.tex" file was found. Check the "target" in your "{CONFIG_NAME}" file.')
       sys.exit(1)
   else:
     if not os.path.isfile('main.tex'):
-      print('No "main.tex" file found. Specify a "target" in your ${CONFIG_NAME} file.')
+      print(f'No "main.tex" file found. Specify a "target" in your "{CONFIG_NAME}" file.')
       sys.exit(1)
     else:
-      print('No "target" specified in ${CONFIG_NAME} file. Using "main".')
+      print(f'No "target" specified in "{CONFIG_NAME}" file. Using "main".')
+    
+  outdir = config.get('outdir', '.')
+  if not os.path.isdir(outdir):
+    print(f'Output directory "{outdir}" not found. Check the "outdir" in your "{CONFIG_NAME}" file.')
+    sys.exit(1)
 
   files = ['**/*.tex', '**/*.sty', '**/*.bib']
   if 'files' in config:
@@ -130,7 +135,7 @@ def main():
     )
 
     if made.returncode != 0:
-      with open('build.log', 'w', encoding='utf-8') as f:
+      with open(os.path.join(outdir, 'build.log'), 'w', encoding='utf-8') as f:
         f.write(made.stdout.decode('utf-8'))
 
       print('Error building TeX. See build.log for details.')
@@ -142,7 +147,7 @@ def main():
 
     build_time = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
 
-    with tarfile.open(f'{target}_{build_time}.tar.gz', 'w:gz') as tar:
+    with tarfile.open(os.path.join(outdir, f'{target}_{build_time}.tar.gz'), 'w:gz') as tar:
       arxiv_files = build_file_list(arxiv_files_include, arxiv_files_exclude, rootdir=tmpdirname)
 
       for filename in sorted(arxiv_files):
@@ -152,10 +157,10 @@ def main():
         print('\tAdding', filename)
         tar.add(os.path.join(tmpdirname, filename), arcname=filename)
 
-    shutil.copy(os.path.join(tmpdirname, f'{target}.pdf'), f'{target}_{build_time}.pdf')
+    shutil.copy(os.path.join(tmpdirname, f'{target}.pdf'), os.path.join(outdir, f'{target}_{build_time}.pdf'))
 
-    print('Tarball created: ', f'{target}_{build_time}.tar.gz')
-    print('PDF created: ', f'{target}_{build_time}.pdf')
+    print('Tarball created: ', os.path.join(outdir, f'{target}_{build_time}.tar.gz'))
+    print('PDF created: ', os.path.join(outdir, f'{target}_{build_time}.pdf'))
 
 if __name__ == '__main__':
   main()
