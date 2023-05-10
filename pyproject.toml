@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tidyarxiv"
-version = "0.1.4"
+version = "1.0.0"
 description = "A simple script to prepare your LaTeX paper for arXiv submission"
 authors = [
   "Dionysis Zindros <dionyziz@stanford.edu>",

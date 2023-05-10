@@ -1,4 +1,5 @@
-#!/bin/python
+#!/usr/bin/env python
+
 import os, tempfile, glob, shutil, fnmatch
 import sys
 import subprocess
@@ -7,7 +8,7 @@ import tarfile
 import datetime
 import json
 
-CONFIG_NAME = '.arxiv'
+CONFIG_NAME = 'tidyarxiv.cfg'
 
 def build_file_list(include_globs, exclude_globs, rootdir=None):
   print('Include globs: ', include_globs)

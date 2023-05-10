@@ -4,7 +4,7 @@ A simple script to prepare your LaTeX paper for arXiv submission.
 
 `tidyarxiv` is a tiny script to run before publishing your paper on arXiv.
 
-First, you create an `.arxiv` configuration file within your project directory.
+First, you create a `tidyarxiv.cfg` configuration file within your project directory.
 Then you run `tidyarxiv` on the root of your project directory.
 
 `tidyarxiv` first copies over *only* the files you specify into a separate
@@ -33,7 +33,7 @@ Python 3.10+
 
 # Config
 
-Create an .arxiv file in the root of your project. See
+Create a `tidyarxiv.cfg` file in the root of your project. See
 [the example](https://github.com/dionyziz/arxiv/blob/main/arxiv.example).
 You can just copy over the example configuration, which has sane defaults.
 
