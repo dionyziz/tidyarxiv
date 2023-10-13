@@ -34,7 +34,7 @@ Python 3.10+
 # Config
 
 Create a `tidyarxiv.cfg` file in the root of your project. See
-[the example](https://github.com/dionyziz/arxiv/blob/main/arxiv.example).
+[the example](https://github.com/dionyziz/arxiv/blob/main/tidyarxiv.cfg.example).
 You can just copy over the example configuration, which has sane defaults.
 
 The file should be a JSON file, which is a dictionary with the following
