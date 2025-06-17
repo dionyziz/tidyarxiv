@@ -171,6 +171,15 @@ def main():
 
     write_build_log(os.path.join(outdir, f'{target}_{build_time}.log'), made)
 
+    # Copy metadata file if specified in config
+    if 'metadata_file' in config:
+      metadata_file = config['metadata_file']
+      if os.path.isfile(metadata_file):
+        shutil.copy(metadata_file, os.path.join(outdir, f'{target}_{build_time}.txt'))
+        print('Metadata file copied: ', os.path.join(outdir, f'{target}_{build_time}.txt'))
+      else:
+        print(f'Warning: Metadata file "{metadata_file}" not found. Skipping metadata file copy.')
+
     print('Tarball created: ', os.path.join(outdir, f'{target}_{build_time}.tar.gz'))
     print('PDF created: ', os.path.join(outdir, f'{target}_{build_time}.pdf'))
     print('Build log saved: ', os.path.join(outdir, f'{target}_{build_time}.log'))

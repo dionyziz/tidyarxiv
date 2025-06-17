@@ -70,6 +70,10 @@ configuration keys:
 * **build_command**: Optional. A string specifying how to build your project.
   Any occurence of %FILE% within the build command will be replaced by
   your target .tex filename. The default command is "latexmk -pdf %FILE%".
+* **metadata_file**: Optional. Path to a metadata file that should be copied
+  to the output directory alongside the generated PDF, tarball, and build log.
+  The file will be copied with the same naming convention as other output files
+  (e.g., `main_20240101_120000.txt`).
 
 # Running
 
