@@ -8,7 +8,7 @@ import tarfile
 import datetime
 import json
 
-CONFIG_NAME = 'tidyarxiv.cfg'
+CONFIG_NAME = os.environ.get('TIDYARXIV_CONFIG_NAME', 'tidyarxiv.cfg')
 
 def build_file_list(include_globs, exclude_globs, rootdir=None):
   print('Include globs: ', include_globs)
