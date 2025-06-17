@@ -39,6 +39,18 @@ def filter_tex(filepath):
   with open(filepath, 'w', encoding='utf-8') as f:
     f.write(''.join(contents))
 
+def write_build_log(filepath, build_result):
+  """Write build log to specified file path"""
+  with open(filepath, 'w', encoding='utf-8') as f:
+    f.write('STDERR:\n')
+    f.write('=======\n')
+    f.write(build_result.stderr.decode('utf-8'))
+    f.write('\n')
+    f.write('STDOUT:\n')
+    f.write('=======\n')
+    f.write(build_result.stdout.decode('utf-8'))
+    f.write('\n')
+
 def main():
   try:
     with open(CONFIG_NAME, encoding='utf-8') as f:
@@ -59,7 +71,7 @@ def main():
       sys.exit(1)
     else:
       print(f'No "target" specified in "{CONFIG_NAME}" file. Using "main".')
-    
+  
   outdir = config.get('outdir', '.')
   if not os.path.isdir(outdir):
     print(f'Output directory "{outdir}" not found. Check the "outdir" in your "{CONFIG_NAME}" file.')
@@ -135,16 +147,7 @@ def main():
     )
 
     if made.returncode != 0:
-      with open(os.path.join(outdir, 'build.log'), 'w', encoding='utf-8') as f:
-        f.write('STDERR:\n')
-        f.write('=======\n')
-        f.write(made.stderr.decode('utf-8'))
-        f.write('\n')
-        f.write('STDOUT:\n')
-        f.write('=======\n')
-        f.write(made.stdout.decode('utf-8'))
-        f.write('\n')
-
+      write_build_log(os.path.join(outdir, 'build.log'), made)
       print('Error building TeX. See build.log for details.')
       sys.exit(1)
 
@@ -166,8 +169,11 @@ def main():
 
     shutil.copy(os.path.join(tmpdirname, f'{target}.pdf'), os.path.join(outdir, f'{target}_{build_time}.pdf'))
 
+    write_build_log(os.path.join(outdir, f'{target}_{build_time}.log'), made)
+
     print('Tarball created: ', os.path.join(outdir, f'{target}_{build_time}.tar.gz'))
     print('PDF created: ', os.path.join(outdir, f'{target}_{build_time}.pdf'))
+    print('Build log saved: ', os.path.join(outdir, f'{target}_{build_time}.log'))
 
 if __name__ == '__main__':
   main()
